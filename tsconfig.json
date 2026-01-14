@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022" /* 変換後のJavaScriptのバージョン */,
+    "module": "ESNext" /* ESM(import/export)を使用する */,
+    "moduleResolution": "Bundler" /* 最新のライブラリ解決ルール */,
+    "lib": ["ES2022"] /* 使用する標準ライブラリ */,
+    "outDir": "./dist" /* ビルド後の出力先 */,
+    "rootDir": "./" /* ソースコードのルート */,
+    "strict": true /* 型チェックを厳格にする（推奨） */,
+    "esModuleInterop": true /* CommonJSとESMの互換性を保つ */,
+    "skipLibCheck": true /* ライブラリ内の型チェックをスキップして高速化 */,
+    "forceConsistentCasingInFileNames": true /* ファイル名の大文字小文字を区別 */
+  },
+  "include": ["backend/**/*"] /* チェック対象のフォルダ */,
+  "exclude": ["node_modules"] /* 除外するフォルダ */
+}
