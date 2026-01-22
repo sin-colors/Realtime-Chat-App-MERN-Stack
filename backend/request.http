@@ -19,3 +19,23 @@ Content-Type: application/json
   "confirmPassword" : "1234567",
   "gender" : "female"
 }
+
+###
+POST http://localhost:5000/api/auth/signup
+Content-Type: application/json
+
+{
+  "userName" : "Bob",
+  "password" : "123456",
+  "confirmPassword" : "123456",
+  "gender" : "male"
+}
+
+###
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "userName" : "Bob",
+  "password" : "123456"
+}

@@ -60,8 +60,41 @@ export async function signup(req: Request, res: Response) {
     });
   }
 }
-export function login(req: Request, res: Response) {
+
+export async function login(req: Request, res: Response) {
   console.log("login User");
+  try {
+    const { userName, password } = req.body;
+    console.log("userName: ", userName);
+    console.log("password: ", password);
+    const user = await User.findOne({ userName });
+    console.log("user: ", user);
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user?.password || ""
+    );
+    console.log("isPasswordCorrect: ", isPasswordCorrect);
+    if (!user || !isPasswordCorrect) {
+      return res
+        .status(400)
+        .json({ error: "ユーザー名かパスワードが間違っています" });
+    }
+    generateTokenAndSetCookie(user._id, res);
+    res.status(200).json({
+      _id: user._id,
+      userName: user.userName,
+      profilePic: user.profilePic,
+    });
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log("Login controllerでエラーが発生しました", err.message);
+    } else {
+      console.log("Login controllerでエラーが発生しました", err);
+    }
+    res.status(500).json({
+      error: "ログイン実行中にサーバー内部でエラーが発生しました",
+    });
+  }
 }
 export function logout(req: Request, res: Response) {
   console.log("logout User");
