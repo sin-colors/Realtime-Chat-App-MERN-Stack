@@ -65,15 +65,15 @@ export async function login(req: Request, res: Response) {
   console.log("login User");
   try {
     const { userName, password } = req.body;
-    console.log("userName: ", userName);
-    console.log("password: ", password);
+    // console.log("userName: ", userName);
+    // console.log("password: ", password);
     const user = await User.findOne({ userName });
-    console.log("user: ", user);
+    // console.log("user: ", user);
     const isPasswordCorrect = await bcrypt.compare(
       password,
-      user?.password || ""
+      user?.password || "",
     );
-    console.log("isPasswordCorrect: ", isPasswordCorrect);
+    // console.log("isPasswordCorrect: ", isPasswordCorrect);
     if (!user || !isPasswordCorrect) {
       return res
         .status(400)
