@@ -45,3 +45,29 @@ export async function sendMessage(req: Request, res: Response) {
       .json({ error: "メッセージ送信中にサーバー内部でエラーが発生しました" });
   }
 }
+
+export async function getMessages(req: Request, res: Response) {
+  try {
+    const { id: userToChatId } = req.params;
+    const senderId = req.user?._id;
+    const conversation = await Conversation.findOne({
+      participants: { $all: [senderId, userToChatId] },
+    }).populate("messages");
+    if (!conversation) {
+      return res.status(200).json([]);
+    }
+    const messages = conversation.messages;
+    res.status(200).json(messages);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log("getMessage controllerでエラーが発生しました", err.message);
+    } else {
+      console.log("getMessage controllerでエラーが発生しました", err);
+    }
+    res
+      .status(500)
+      .json({
+        error: "メッセージ取得中に、サーバー内部でエラーが発生しました",
+      });
+  }
+}
