@@ -41,7 +41,7 @@ export async function signup(req: Request, res: Response) {
       await newUser.save();
       res.status(201).json({
         _id: newUser._id,
-        username: newUser.userName,
+        userName: newUser.userName,
         profilePic: newUser.profilePic,
       });
     } else {
