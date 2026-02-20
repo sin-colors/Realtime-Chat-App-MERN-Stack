@@ -19,6 +19,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PasswordInput from "@/components/PasswordInput";
+// import useSignup from "@/hooks/useSignup";
+import { toast } from "sonner";
 const formSchema = z
   .object({
     username: z.string().min(2, {
@@ -54,8 +56,29 @@ function Signup() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  // const { loading, signup } = useSignup();
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("values: ", values);
+    // await signup(values);
+    // const success = handleInputErrors(values);
+    // if (!success) return;
+    async function registerPromise() {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      if (!response.ok) throw new Error("登録に失敗しました");
+      const signupData = await response.json();
+      console.log(signupData);
+      return signupData;
+    }
+    toast.promise(registerPromise(), {
+      loading: "登録しています。。。",
+      success: (data) => `${data.userName} さんの登録が完了しました！`,
+      error: (err) => err.message || "予期せぬエラーが発生しました",
+    });
   }
   return (
     <div className="flex min-h-screen min-w-96 items-center justify-center p-4">
@@ -202,12 +225,12 @@ function Signup() {
               </div> */}
 
               <p className="text-sm text-gray-300">
-                アカウントを持っていない方は
+                アカウントを持っている方は
                 <Link
-                  to="/signup" // href から to に変更
+                  to="/login" // href(Next.js) から to(react-routero-dom) に変更
                   className="mx-1 inline-block text-yellow-500 hover:text-yellow-400 hover:underline"
                 >
-                  アカウント作成
+                  ログインへ
                 </Link>
                 へ
               </p>

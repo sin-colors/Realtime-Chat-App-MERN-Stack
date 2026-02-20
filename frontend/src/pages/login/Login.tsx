@@ -146,7 +146,7 @@ export default function Login() {
               <p className="text-sm text-gray-300">
                 アカウントを持っていない方は
                 <Link
-                  to="/signup" // href から to に変更
+                  to="/signup" // href(Next.js) から to(react-router-dom) に変更
                   className="mx-1 inline-block text-yellow-500 hover:text-yellow-400 hover:underline"
                 >
                   アカウント作成

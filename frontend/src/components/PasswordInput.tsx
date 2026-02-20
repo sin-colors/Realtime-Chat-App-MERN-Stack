@@ -10,8 +10,8 @@ const PasswordInput = React.forwardRef<
   React.ComponentProps<"input">
 >(function PasswordInput({ className, ...props }, ref) {
   const [showPassword, setShowPassword] = useState(false);
-  console.log("showPassword: ", showPassword);
-  console.log({ ...props });
+  // console.log("showPassword: ", showPassword);
+  // console.log({ ...props });
 
   return (
     <div className="relative">

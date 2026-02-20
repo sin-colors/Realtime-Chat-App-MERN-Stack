@@ -1,3 +1,4 @@
+import MessageContainer from "@/components/messages/MessageContainer";
 import Sidebar from "@/components/sidebar/Sidebar";
 
 function Home() {
@@ -5,7 +6,7 @@ function Home() {
   return (
     <div className="flex overflow-hidden rounded-lg bg-gray-400/0 bg-clip-padding backdrop-blur-lg backdrop-filter sm:h-[450px] md:h-[550px]">
       <Sidebar />
-      {/* <MessageContainer /> */}
+      <MessageContainer />
     </div>
   );
 }
