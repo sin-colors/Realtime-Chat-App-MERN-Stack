@@ -7,42 +7,64 @@ interface signupProps {
   gender: "male" | "female";
 }
 
+// function useSignup() {
+//   const [loading, setLoading] = useState<boolean>(false);
+//   async function signup({
+//     username,
+//     password,
+//     confirmPassword,
+//     gender,
+//   }: signupProps) {
+//     const success = handleInputErrors({
+//       username,
+//       password,
+//       confirmPassword,
+//       gender,
+//     });
+//     if (!success) return;
+//     setLoading(true);
+//     try {
+//       const response = await fetch("/api/auth/signup", {
+//         method: "POST",
+//         headers: { "Content-type": "application/json" },
+//         body: JSON.stringify({ username, password, confirmPassword, gender }),
+//       });
+//       const data = await response.json();
+//       console.log(data);
+//     } catch (err) {
+//       // toast.error(err.message);
+//       if (err instanceof Error) {
+//         console.log(err.message);
+//       } else {
+//         console.log(err);
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   }
+//   return { loading, signup };
+// }
 function useSignup() {
-  const [loading, setLoading] = useState<boolean>(false);
-  async function signup({
-    username,
-    password,
-    confirmPassword,
-    gender,
-  }: signupProps) {
-    const success = handleInputErrors({
-      username,
-      password,
-      confirmPassword,
-      gender,
+  async function registerPromise() {
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify(values),
     });
-    if (!success) return;
-    setLoading(true);
-    try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify({ username, password, confirmPassword, gender }),
-      });
-      const data = await response.json();
-      console.log(data);
-    } catch (err) {
-      // toast.error(err.message);
-      if (err instanceof Error) {
-        console.log(err.message);
-      } else {
-        console.log(err);
-      }
-    } finally {
-      setLoading(false);
-    }
+    if (!response.ok) throw new Error("登録に失敗しました");
+    const signupData = await response.json();
+    if (signupData.error) throw new Error(signupData.error);
+    console.log(signupData);
+    localStorage.setItem("chat-user", JSON.stringify(signupData));
+    const { setAuthUser } = useAuthContext();
+    setAuthUser(signupData);
+    return signupData;
   }
-  return { loading, signup };
+  toast.promise(registerPromise(), {
+    loading: "登録しています。。。",
+    success: (data) => `${data.userName} さんの登録が完了しました！`,
+    error: (err) => err.message || "予期せぬエラーが発生しました",
+  });
 }
 export default useSignup;
 

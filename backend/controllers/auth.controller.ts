@@ -7,10 +7,17 @@ export async function signup(req: Request, res: Response) {
   console.log("signup User");
   try {
     const { userName, password, confirmPassword, gender } = req.body;
+    // console.log(req.body);
+    // console.log("userName: ", userName);
+    // console.log("password: ", password);
+    // console.log("confirmPassword: ", confirmPassword);
+    // console.log("gender: ", gender);
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "パスワードが一致しません" });
     }
+    // console.log("パスワードは一致");
     const user = await User.findOne({ userName });
+    // console.log("user: ", user);
     if (user) {
       return res
         .status(400)
@@ -19,6 +26,7 @@ export async function signup(req: Request, res: Response) {
     // ここでパスワードのハッシュ化を実装
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    // console.log("パスワードのハッシュ化終了");
 
     // https://avatar-placeholder.iran.liara.run/
     // アバターのプレースホルダーを提供するサイト。
@@ -36,6 +44,7 @@ export async function signup(req: Request, res: Response) {
       gender,
       profilePic: gender === "male" ? boyProfilePic : girlProfilePic,
     });
+    // console.log("newUser: ", newUser);
     if (newUser) {
       generateTokenAndSetCookie(newUser._id, res);
       await newUser.save();

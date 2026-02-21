@@ -21,9 +21,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PasswordInput from "@/components/PasswordInput";
 // import useSignup from "@/hooks/useSignup";
 import { toast } from "sonner";
+import { useAuthContext } from "@/context/AuthContext";
 const formSchema = z
   .object({
-    username: z.string().min(2, {
+    userName: z.string().min(2, {
       message: "ユーザー名は2文字以上で入力してください。",
     }),
     password: z.string().min(6, {
@@ -47,7 +48,7 @@ function Signup() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      userName: "",
       password: "",
       confirmPassword: "",
       // manCheckbox: false,
@@ -55,6 +56,8 @@ function Signup() {
       gender: undefined,
     },
   });
+
+  const { setAuthUser } = useAuthContext();
 
   // const { loading, signup } = useSignup();
 
@@ -71,7 +74,11 @@ function Signup() {
       });
       if (!response.ok) throw new Error("登録に失敗しました");
       const signupData = await response.json();
+      if (signupData.error) throw new Error(signupData.error);
       console.log(signupData);
+      localStorage.setItem("chat-user", JSON.stringify(signupData));
+
+      setAuthUser(signupData);
       return signupData;
     }
     toast.promise(registerPromise(), {
@@ -79,6 +86,12 @@ function Signup() {
       success: (data) => `${data.userName} さんの登録が完了しました！`,
       error: (err) => err.message || "予期せぬエラーが発生しました",
     });
+    // localStorage
+    // ユーザーをローカルストレージに保存する処理をここに追加する
+    // context
+    // コンテキストに保存してホームページにリダイレクトする処理をここに追加する
+    // const { setAuthUser } = useAuthContext();
+    //   setAuthUser(signupData);
   }
   return (
     <div className="flex min-h-screen min-w-96 items-center justify-center p-4">
@@ -93,7 +106,7 @@ function Signup() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="username"
+                name="userName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-gray-300">ユーザー名</FormLabel>

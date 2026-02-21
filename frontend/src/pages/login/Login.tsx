@@ -74,7 +74,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const formSchema = z.object({
-  username: z.string().min(2, {
+  userName: z.string().min(2, {
     message: "ユーザー名は2文字以上で入力してください。",
   }),
   password: z.string().min(6, {
@@ -86,7 +86,7 @@ export default function Login() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      userName: "",
       password: "",
     },
   });
@@ -109,7 +109,7 @@ export default function Login() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="username"
+                name="userName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-gray-300">ユーザー名</FormLabel>
