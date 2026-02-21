@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom"; // next/link から変更
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 // import GenderCheckbox from "./GenderCheckbox";
 
@@ -20,33 +19,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PasswordInput from "@/components/PasswordInput";
 // import useSignup from "@/hooks/useSignup";
-import { toast } from "sonner";
-import { useAuthContext } from "@/context/AuthContext";
-const formSchema = z
-  .object({
-    userName: z.string().min(2, {
-      message: "ユーザー名は2文字以上で入力してください。",
-    }),
-    password: z.string().min(6, {
-      message: "パスワードは6文字以上で入力してください。",
-    }),
-    confirmPassword: z.string().min(6, {
-      message: "パスワードは6文字以上で入力してください。",
-    }),
-    // manCheckbox: z.boolean(),
-    // womanCheckbox: z.boolean(),
-    gender: z.enum(["male", "female"], {
-      message: "性別を選択してください。",
-    }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "パスワードが一致しません。",
-    path: ["confirmPassword"],
-  });
+// import { toast } from "sonner";
+// import { useAuthContext } from "@/context/AuthContext";
+import { registerSchema, type RegisterType } from "@/lib/schema/authSchema";
+import useSignup from "@/hooks/useSignup";
 
 function Signup() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<RegisterType>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       userName: "",
       password: "",
@@ -57,42 +37,36 @@ function Signup() {
     },
   });
 
-  const { setAuthUser } = useAuthContext();
+  // const { setAuthUser } = useAuthContext();
 
-  // const { loading, signup } = useSignup();
+  const { signup } = useSignup();
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("values: ", values);
-    // await signup(values);
-    // const success = handleInputErrors(values);
-    // if (!success) return;
-    async function registerPromise() {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      if (!response.ok) throw new Error("登録に失敗しました");
-      const signupData = await response.json();
-      if (signupData.error) throw new Error(signupData.error);
-      console.log(signupData);
-      localStorage.setItem("chat-user", JSON.stringify(signupData));
+  // async function onSubmit(values: RegisterType) {
+  //   // console.log("values: ", values);
+  //   // await signup(values);
+  //   // const success = handleInputErrors(values);
+  //   // if (!success) return;
+  //   async function registerPromise() {
+  //     const response = await fetch("/api/auth/signup", {
+  //       method: "POST",
+  //       headers: { "Content-type": "application/json" },
+  //       body: JSON.stringify(values),
+  //     });
+  //     if (!response.ok) throw new Error("登録に失敗しました");
+  //     const signupData = await response.json();
+  //     if (signupData.error) throw new Error(signupData.error);
+  //     // console.log(signupData);
+  //     localStorage.setItem("chat-user", JSON.stringify(signupData));
 
-      setAuthUser(signupData);
-      return signupData;
-    }
-    toast.promise(registerPromise(), {
-      loading: "登録しています。。。",
-      success: (data) => `${data.userName} さんの登録が完了しました！`,
-      error: (err) => err.message || "予期せぬエラーが発生しました",
-    });
-    // localStorage
-    // ユーザーをローカルストレージに保存する処理をここに追加する
-    // context
-    // コンテキストに保存してホームページにリダイレクトする処理をここに追加する
-    // const { setAuthUser } = useAuthContext();
-    //   setAuthUser(signupData);
-  }
+  //     setAuthUser(signupData);
+  //     return signupData;
+  //   }
+  //   toast.promise(registerPromise(), {
+  //     loading: "登録しています。。。",
+  //     success: (data) => `${data.userName} さんの登録が完了しました！`,
+  //     error: (err) => err.message || "予期せぬエラーが発生しました",
+  //   });
+  // }
   return (
     <div className="flex min-h-screen min-w-96 items-center justify-center p-4">
       <Card className="w-full max-w-md border-gray-800 bg-gray-400/5 backdrop-blur-xl">
@@ -103,7 +77,7 @@ function Signup() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(signup)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="userName"
