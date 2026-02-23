@@ -23,6 +23,7 @@ import PasswordInput from "@/components/PasswordInput";
 // import { useAuthContext } from "@/context/AuthContext";
 import { registerSchema, type RegisterType } from "@/lib/schema/authSchema";
 import useSignup from "@/hooks/useSignup";
+import { Loader2 } from "lucide-react";
 
 function Signup() {
   const form = useForm<RegisterType>({
@@ -224,9 +225,14 @@ function Signup() {
 
               <Button
                 type="submit"
+                disabled={form.formState.isSubmitting}
                 className="w-full bg-blue-600 text-white hover:bg-blue-700"
               >
-                登録
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-white" />
+                ) : (
+                  "登録"
+                )}
               </Button>
             </form>
           </Form>
@@ -234,6 +240,11 @@ function Signup() {
       </Card>
     </div>
   );
+}
+
+// <Loader2 />を使用した
+{
+  /* <span className="loading loading-spinner"></span> */
 }
 
 // function Signup() {

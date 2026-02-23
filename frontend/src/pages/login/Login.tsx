@@ -59,7 +59,7 @@
 import { Link } from "react-router-dom"; // next/link から変更
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+// import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -72,28 +72,34 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { loginSchema, type LoginType } from "@/lib/schema/authSchema";
+import useLogin from "@/hooks/useLogin";
+import { Loader2 } from "lucide-react";
 
-const formSchema = z.object({
-  userName: z.string().min(2, {
-    message: "ユーザー名は2文字以上で入力してください。",
-  }),
-  password: z.string().min(6, {
-    message: "パスワードは6文字以上で入力してください。",
-  }),
-});
+// const formSchema = z.object({
+//   userName: z.string().min(2, {
+//     message: "ユーザー名は2文字以上で入力してください。",
+//   }),
+//   password: z.string().min(6, {
+//     message: "パスワードは6文字以上で入力してください。",
+//   }),
+// });
 
 export default function Login() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<LoginType>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       userName: "",
       password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const { login } = useLogin();
+
+  // async function onSubmit(values: LoginType) {
+  //   // console.log(values);
+  //   await login(values);
+  // }
 
   return (
     <div className="flex min-h-screen min-w-96 items-center justify-center p-4">
@@ -106,7 +112,7 @@ export default function Login() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(login)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="userName"
@@ -156,9 +162,14 @@ export default function Login() {
 
               <Button
                 type="submit"
+                disabled={form.formState.isSubmitting}
                 className="w-full bg-blue-600 text-white hover:bg-blue-700"
               >
-                ログイン
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-white" />
+                ) : (
+                  "ログイン"
+                )}
               </Button>
             </form>
           </Form>
@@ -166,4 +177,9 @@ export default function Login() {
       </Card>
     </div>
   );
+}
+
+// <span className="loading loading-spinner"></span>
+{
+  /* <Loader2 className="h-6 w-6 animate-spin text-white" /> */
 }

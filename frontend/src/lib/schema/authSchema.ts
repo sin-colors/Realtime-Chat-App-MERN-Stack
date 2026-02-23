@@ -1,5 +1,6 @@
 import * as z from "zod";
 
+//-----------------登録--------------------
 export const registerSchema = z
   .object({
     userName: z.string().min(2, {
@@ -23,3 +24,14 @@ export const registerSchema = z
   });
 
 export type RegisterType = z.infer<typeof registerSchema>;
+
+//-----------------------ログイン-----------------------------
+export const loginSchema = z.object({
+  userName: z.string().min(2, {
+    message: "ユーザー名は2文字以上で入力してください。",
+  }),
+  password: z.string().min(6, {
+    message: "パスワードは6文字以上で入力してください。",
+  }),
+});
+export type LoginType = z.infer<typeof loginSchema>;

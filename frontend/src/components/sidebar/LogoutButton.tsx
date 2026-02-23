@@ -1,5 +1,6 @@
 // import { useAuthContext } from "@/context/AuthContext";
 import { useLogout } from "@/hooks/useLogout";
+import { Loader2 } from "lucide-react";
 import { BiLogOut } from "react-icons/bi";
 // import { toast } from "sonner";
 
@@ -26,7 +27,8 @@ function LogoutButton() {
   return (
     <div className="mt-auto">
       {loading ? (
-        <span className="loading loading-spinner"></span>
+        // <span className="loading loading-spinner text-white"></span>
+        <Loader2 className="h-6 w-6 animate-spin text-white" />
       ) : (
         <BiLogOut
           onClick={logout}
@@ -42,3 +44,9 @@ export default LogoutButton;
 // Shadcnを使っているのでこちらのボタンでも良いかと...
 // import { LogOut } from "lucide-react";
 // <LogOut />
+
+//Shadcn UIのプロジェクトでは、lucide-react の Loader2 アイコンに Tailwind CSS の animate-spin クラスを付与して回転させるのが一般的
+// animate-spin: くるくる回るアニメーション
+{
+  /* <Loader2 className="h-6 w-6 animate-spin text-white" /> */
+}

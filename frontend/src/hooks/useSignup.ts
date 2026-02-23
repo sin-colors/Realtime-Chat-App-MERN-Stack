@@ -6,7 +6,7 @@ function useSignup() {
   const { setAuthUser } = useAuthContext();
   async function signup(values: RegisterType) {
     // console.log("values: ", values);
-    async function registerPromise() {
+    const registerPromise = (async () => {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -20,12 +20,13 @@ function useSignup() {
 
       setAuthUser(signupData);
       return signupData;
-    }
-    return toast.promise(registerPromise(), {
+    })();
+    return toast.promise(registerPromise, {
       loading: "登録しています。。。",
       success: (data) => `${data.userName} さんの登録が完了しました！`,
       error: (err) => err.message || "予期せぬエラーが発生しました",
     });
+    await registerPromise;
   }
   return { signup };
 }
