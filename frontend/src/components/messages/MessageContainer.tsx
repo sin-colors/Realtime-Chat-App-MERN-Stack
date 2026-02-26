@@ -1,12 +1,17 @@
+import useConversation from "@/zustand/useConversation";
 import { Label } from "../ui/label";
 import MessageInput from "./MessageInput";
 import Messages from "./Messages";
 
 function MessageContainer() {
-  const noChatSelected = false;
+  // const noChatSelected = false;
+  const { selectedConversation, setSelectedConversation } = useConversation();
+  useEffect(() => {
+    return () => setSelectedConversation(null);
+  }, [setSelectedConversation]);
   return (
     <div className="flex flex-col md:min-w-[450px]">
-      {noChatSelected ? (
+      {!selectedConversation ? (
         <NoChatSelected />
       ) : (
         <>
@@ -28,6 +33,7 @@ function MessageContainer() {
 export default MessageContainer;
 
 import { TiMessages } from "react-icons/ti";
+import { useEffect } from "react";
 function NoChatSelected() {
   return (
     <div className="flex h-full w-full items-center justify-center">
