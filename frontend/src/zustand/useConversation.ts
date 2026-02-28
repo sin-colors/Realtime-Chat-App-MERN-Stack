@@ -10,11 +10,20 @@ export interface User {
   // password は .select("-password") で除外されているため含まれない
 }
 
+export interface MessageType {
+  _id: string;
+  senderId: string;
+  receiverId: string;
+  message: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface ConversationState {
-  selectedConversation: User | null; // 本来はUser型など
+  selectedConversation: User | null; // 後で修正する必要がある！ selectedConversationはグループチャットの可能性もある
   setSelectedConversation: (selectedConversation: User | null) => void;
-  messages: string[];
-  setMessages: (messages: string[]) => void;
+  messages: MessageType[];
+  setMessages: (messages: MessageType[]) => void;
 }
 
 // set関数は「前の値を捨てて、新しい値で上書きする」挙動の関数

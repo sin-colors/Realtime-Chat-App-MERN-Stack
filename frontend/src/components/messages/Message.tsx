@@ -1,19 +1,33 @@
-import React from "react";
+import { useAuthContext } from "@/context/AuthContext";
+import type { MessageType } from "@/zustand/useConversation";
+import useConversation from "@/zustand/useConversation";
 
-function Message() {
+function Message({ message }: { message: MessageType }) {
+  const { authUser } = useAuthContext();
+  const { selectedConversation } = useConversation();
+  const fromMe = message.senderId === authUser?._id;
+  const chatClassName = fromMe ? "chat-end" : "chat-start";
+  // 後で修正する必要がある！ selectedConversationはグループチャットの可能性もある
+  const profilePic = fromMe
+    ? authUser.profilePic
+    : selectedConversation?.profilePic;
+  const bubbleBgColor = fromMe ? "bg-blue-500" : "";
   return (
-    <div className="chat chat-end">
+    <div className={`chat ${chatClassName}`}>
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
           <img
             alt="Tailwind CSS chat bubble component"
-            src={`https://img.daisyui.com/images/profile/demo/kenobee@192.webp`}
+            // src={`https://img.daisyui.com/images/profile/demo/kenobee@192.webp`}
+            src={profilePic}
           />
         </div>
       </div>
-      <div className={`chat-bubble bg-blue-500 text-white`}>こんにちは</div>
+      <div className={`chat-bubble text-white ${bubbleBgColor}`}>
+        {message.message}
+      </div>
       <div className="chat-footer flex items-center gap-1 text-xs opacity-50">
-        12:42
+        {message.createdAt}
       </div>
     </div>
   );

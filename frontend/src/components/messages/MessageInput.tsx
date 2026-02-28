@@ -31,14 +31,14 @@ function MessageInput() {
   });
   const { messages, setMessages, selectedConversation } = useConversation();
   async function onSubmit(value: MessageInputType) {
-    if (!value) return;
+    if (!value.message.trim()) return;
     try {
       const response = await fetch(
         `/api/messages/send/${selectedConversation?._id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: value }),
+          body: JSON.stringify(value),
         },
       );
       const data = await response.json();

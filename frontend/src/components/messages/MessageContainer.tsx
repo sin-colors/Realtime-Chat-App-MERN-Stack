@@ -20,7 +20,9 @@ function MessageContainer() {
             {/* <span className="label-text">To:</span> */}
             {/* <span className="text-sm font-medium text-slate-200">To:</span> */}
             <Label className="font-normal text-slate-200">To:</Label>
-            <span className="font-bold text-gray-900">John Doe</span>
+            <span className="font-bold text-gray-900">
+              {selectedConversation.userName}
+            </span>
           </div>
           <Messages />
           <MessageInput />
