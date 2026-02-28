@@ -11,6 +11,9 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import useConversation from "@/zustand/useConversation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 const messageInputSchema = z.object({
   message: z
@@ -26,7 +29,31 @@ function MessageInput() {
       message: "",
     },
   });
-  function onSubmit() {}
+  const { messages, setMessages, selectedConversation } = useConversation();
+  async function onSubmit(value: MessageInputType) {
+    if (!value) return;
+    try {
+      const response = await fetch(
+        `/api/messages/send/${selectedConversation?._id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: value }),
+        },
+      );
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setMessages([...messages, data]);
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("メッセージの送信に失敗しました！");
+      }
+    } finally {
+      form.reset();
+    }
+  }
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="my-3 px-4">
@@ -47,7 +74,11 @@ function MessageInput() {
                 variant={"ghost"}
                 className="absolute inset-y-0 end-0 flex items-center px-3"
               >
-                <BsSend />
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-white" />
+                ) : (
+                  <BsSend />
+                )}
               </Button>
             </FormItem>
           )}
