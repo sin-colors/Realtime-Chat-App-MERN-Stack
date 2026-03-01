@@ -25,7 +25,7 @@ function Message({ message }: { message: MessageType }) {
           />
         </div>
       </div>
-      <div className={`chat-bubble text-white ${bubbleBgColor}`}>
+      <div className={`chat-bubble text-white ${bubbleBgColor} pb-2`}>
         {message.message}
       </div>
       <div className="chat-footer flex items-center gap-1 text-xs opacity-50">
