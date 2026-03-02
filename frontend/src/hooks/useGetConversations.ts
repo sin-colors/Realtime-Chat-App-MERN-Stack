@@ -38,3 +38,25 @@ function useGetConversations() {
   return { loading, conversations };
 }
 export default useGetConversations;
+
+//-------------------------------------------------
+// getUsers: async () => {
+//   set({ loading: true });
+//   try {
+//     const response = await fetch("/api/users");
+//     const data = await response.json();
+
+//     if (!response.ok) {
+//       // サーバーが返したエラーメッセージを使って例外を投げる
+//       throw new Error(data.error || "エラーが発生しました");
+//     }
+
+//     // 成功時のみ state を更新
+//     set({ users: data as User[] });
+//   } catch (err: any) {
+//     // ここでトーストを表示したり、エラー状態を保持したりする
+//     toast.error(err.message);
+//   } finally {
+//     set({ loading: false });
+//   }
+// }
