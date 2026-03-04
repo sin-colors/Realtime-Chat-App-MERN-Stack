@@ -9,14 +9,14 @@ export async function sendMessage(req: Request, res: Response) {
     console.log(req.body);
     const { message } = req.body;
     // console.log("message: ", message);
-    const { id: receiverId } = req.params;
-    console.log("receiverId: ", receiverId);
+    const { receiverId } = req.params;
+    // console.log("receiverId: ", receiverId);
     if (!req.user) {
       return res.status(401).json({ error: "ユーザーが認証されていません" });
     }
     const senderId = req.user._id;
-    console.log("req.user", req.user);
-    console.log("senderId: ", senderId);
+    // console.log("req.user", req.user);
+    // console.log("senderId: ", senderId);
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] },
     });

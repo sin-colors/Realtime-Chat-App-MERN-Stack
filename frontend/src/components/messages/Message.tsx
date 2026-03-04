@@ -7,8 +7,8 @@ function Message({ message }: { message: MessageType }) {
   const { authUser } = useAuthContext();
   const { selectedConversation } = useConversation();
   const fromMe = message.senderId === authUser?._id;
-  console.log("message.senderId: ", message.senderId);
-  console.log("authUser?._id: ", authUser?._id);
+  // console.log("message.senderId: ", message.senderId);
+  // console.log("authUser?._id: ", authUser?._id);
   const chatClassName = fromMe ? "chat-end" : "chat-start";
   // 後で修正する必要がある！ selectedConversationはグループチャットの可能性もある
   const profilePic = fromMe

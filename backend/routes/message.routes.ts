@@ -7,6 +7,6 @@ const router = express.Router();
 // 現在ログインしているユーザー(自分)と:idで指定したユーザーとのメッセージを取得する
 router.get("/:id", protectRoute, getMessages);
 // :idは送信先のユーザーのid(_id)
-router.post("/send/:id", protectRoute, sendMessage);
+router.post("/send/:receiverId", protectRoute, sendMessage);
 
 export default router;
