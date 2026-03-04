@@ -1,6 +1,6 @@
 import { useAuthContext } from "@/context/AuthContext";
+import type { MessageType } from "@/types";
 import { extractTime } from "@/utils/extractTime";
-import type { MessageType } from "@/zustand/useConversation";
 import useConversation from "@/zustand/useConversation";
 
 function Message({ message }: { message: MessageType }) {

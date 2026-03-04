@@ -6,7 +6,7 @@ import { getReceiverSocketId, io } from "../socket/socket";
 export async function sendMessage(req: Request, res: Response) {
   console.log("message sent!");
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const { message } = req.body;
     // console.log("message: ", message);
     const { receiverId } = req.params;
@@ -32,7 +32,6 @@ export async function sendMessage(req: Request, res: Response) {
     });
     if (newMessage) {
       conversation.messages.push(newMessage._id);
-      // 後でここにsocket.ioを代入する
     }
     await Promise.all([conversation.save(), newMessage.save()]);
     if (typeof receiverId === "string") {

@@ -4,7 +4,6 @@ import MessageInput from "./MessageInput";
 import Messages from "./Messages";
 
 function MessageContainer() {
-  // const noChatSelected = false;
   const { selectedConversation, setSelectedConversation } = useConversation();
   useEffect(() => {
     return () => setSelectedConversation(null);

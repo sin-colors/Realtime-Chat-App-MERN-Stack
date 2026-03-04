@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import useListenMessage from "@/hooks/useListenMessage";
 
 function Messages() {
-  const { messages, loading } = useGetMessages();
+  const { data: messages = [], isLoading } = useGetMessages();
   // console.log("messages: ", messages);
   useListenMessage();
   const messageRef = useRef<HTMLDivElement>(null);
@@ -18,11 +18,11 @@ function Messages() {
   }, [messages]);
   return (
     <div className="flex-1 overflow-auto px-4">
-      {loading && [...Array(3)].map((_, idx) => <MessageSkelton key={idx} />)}
-      {!loading && messages.length === 0 && (
+      {isLoading && [...Array(3)].map((_, idx) => <MessageSkelton key={idx} />)}
+      {!isLoading && messages.length === 0 && (
         <p className="test-center">Send a message to start the conversation</p>
       )}
-      {!loading &&
+      {!isLoading &&
         messages.length > 0 &&
         messages.map((message) => (
           <div key={message._id} ref={messageRef}>

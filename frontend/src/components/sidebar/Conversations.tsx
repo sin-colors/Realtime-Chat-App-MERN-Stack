@@ -4,10 +4,10 @@ import { Loader2 } from "lucide-react";
 import { getRandomEmoji } from "@/utils/emoji";
 
 function Conversations() {
-  const { loading, conversations } = useGetConversations();
+  const { isLoading, data: conversations } = useGetConversations();
   return (
     <div className="flex flex-col overflow-auto py-2">
-      {conversations.map((conversation, idx) => (
+      {conversations?.map((conversation, idx) => (
         <Conversation
           key={conversation._id}
           conversation={conversation}
@@ -15,7 +15,7 @@ function Conversations() {
           lastIdx={idx === conversations.length - 1}
         />
       ))}
-      {loading ? <Loader2 /> : null}
+      {isLoading ? <Loader2 /> : null}
     </div>
   );
 }

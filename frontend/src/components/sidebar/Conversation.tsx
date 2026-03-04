@@ -1,5 +1,6 @@
 import { useSocketContext } from "@/context/SocketContext";
-import useConversation, { type User } from "@/zustand/useConversation";
+import type { User } from "@/types";
+import useConversation from "@/zustand/useConversation";
 
 interface Props {
   conversation: User;
