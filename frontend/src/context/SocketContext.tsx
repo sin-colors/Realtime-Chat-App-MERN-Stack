@@ -7,7 +7,7 @@ import {
 } from "react";
 import { useAuthContext } from "./AuthContext";
 import io, { Socket } from "socket.io-client";
-import type { User } from "@/zustand/useConversation";
+// import type { User } from "@/zustand/useConversation";
 
 interface SocketContextType {
   socket: Socket | null;
