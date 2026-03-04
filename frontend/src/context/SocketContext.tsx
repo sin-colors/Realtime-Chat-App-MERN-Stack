@@ -15,7 +15,7 @@ interface SocketContextType {
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
-
+// コンテキストとカスタムフックとプロバイダー(コンポーネント)を分けて記述したらエラーは解消するが小さいプロジェクトではパフォーマンス上、特に問題にならないのでとりあえずこのままにしておく
 export function useSocketContext() {
   const context = useContext(SocketContext);
   if (!context)
@@ -40,7 +40,7 @@ export function SocketContextProvider({ children }: { children: ReactNode }) {
         },
       });
       setSocket(newSocket);
-      newSocket?.on("getOnlineUsers", (users) => {
+      newSocket?.on("getOnlineUsers", (users: string[]) => {
         setOnlineUsers(users);
       });
       return () => {

@@ -39,7 +39,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
-
+// コンテキストとカスタムフックとプロバイダー(コンポーネント)を分けて記述したらエラーは解消するが小さいプロジェクトではパフォーマンス上、特に問題にならないのでとりあえずこのままにしておく
 export function useAuthContext() {
   const context = useContext(AuthContext);
   if (context === undefined)

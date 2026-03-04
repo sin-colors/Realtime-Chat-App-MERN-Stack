@@ -2,10 +2,12 @@ import useGetMessages from "@/hooks/useGetMessages";
 import Message from "./Message";
 import MessageSkelton from "../skeltons/MessageSkelton";
 import { useEffect, useRef } from "react";
+import useListenMessage from "@/hooks/useListenMessage";
 
 function Messages() {
   const { messages, loading } = useGetMessages();
   // console.log("messages: ", messages);
+  useListenMessage();
   const messageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setTimeout(() => {

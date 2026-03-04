@@ -36,4 +36,8 @@ io.on("connection", (socket) => {
   });
 });
 
-export { app, io, server };
+function getReceiverSocketId(receiverId: string) {
+  return userSocketMap[receiverId];
+}
+
+export { app, io, server, getReceiverSocketId };

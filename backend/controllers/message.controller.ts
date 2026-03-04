@@ -1,20 +1,22 @@
 import { Request, Response } from "express";
 import Conversation from "../models/conversation.model";
 import Message from "../models/message.model";
+import { getReceiverSocketId, io } from "../socket/socket";
 
 export async function sendMessage(req: Request, res: Response) {
   console.log("message sent!");
   try {
-    // console.log(req.body);
+    console.log(req.body);
     const { message } = req.body;
     // console.log("message: ", message);
     const { id: receiverId } = req.params;
-    // console.log("receiverId: ", receiverId);
+    console.log("receiverId: ", receiverId);
     if (!req.user) {
       return res.status(401).json({ error: "ユーザーが認証されていません" });
     }
     const senderId = req.user._id;
-    // console.log("senderId: ", senderId);
+    console.log("req.user", req.user);
+    console.log("senderId: ", senderId);
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] },
     });
@@ -33,6 +35,12 @@ export async function sendMessage(req: Request, res: Response) {
       // 後でここにsocket.ioを代入する
     }
     await Promise.all([conversation.save(), newMessage.save()]);
+    if (typeof receiverId === "string") {
+      const receiverSocketId = getReceiverSocketId(receiverId);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", newMessage);
+      }
+    }
     res.status(201).json(newMessage);
   } catch (err) {
     if (err instanceof Error) {
@@ -64,10 +72,8 @@ export async function getMessages(req: Request, res: Response) {
     } else {
       console.log("getMessage controllerでエラーが発生しました", err);
     }
-    res
-      .status(500)
-      .json({
-        error: "メッセージ取得中に、サーバー内部でエラーが発生しました",
-      });
+    res.status(500).json({
+      error: "メッセージ取得中に、サーバー内部でエラーが発生しました",
+    });
   }
 }
