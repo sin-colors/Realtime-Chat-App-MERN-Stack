@@ -10,10 +10,19 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+// {user1のID:user1のソケットID, user2のID:user2のソケットID, .... }となる予定
+const userSocketMap = {};
 io.on("connection", (socket) => {
   console.log("a user connected", socket.id);
+  const userId = socket.handshake.query.userId;
+  if (userId != "undefined") {
+    userSocketMap[userId] = socket.id;
+  }
+  io.emit("getOnlineUsers", Object.keys(userSocketMap));
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
+    delete userSocketMap[userId];
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });
 

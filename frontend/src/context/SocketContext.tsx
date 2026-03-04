@@ -11,7 +11,7 @@ import type { User } from "@/zustand/useConversation";
 
 interface SocketContextType {
   socket: Socket | null;
-  onlineUsers: User[];
+  onlineUsers: string[];
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -27,12 +27,22 @@ export function useSocketContext() {
 
 export function SocketContextProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const { authUser } = useAuthContext();
   useEffect(() => {
     if (authUser) {
-      const newSocket = io("http://localhost:5000");
+      const newSocket = io("http://localhost:5000", {
+        // query→クライアントサイドからsocketに付加情報を渡すときに使用するオプション
+        query: {
+          // サーバー側では、socket.handshake.query.userIdでauthUser._idが取得できる
+          // (socket.handshake.queryでqueryオブジェクトが取得できる)
+          userId: authUser._id,
+        },
+      });
       setSocket(newSocket);
+      newSocket?.on("getOnlineUsers", (users) => {
+        setOnlineUsers(users);
+      });
       return () => {
         newSocket.close();
         setSocket(null);
