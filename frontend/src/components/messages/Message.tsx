@@ -32,6 +32,9 @@ function Message({ message }: { message: MessageType }) {
       </div>
       <div className="chat-footer flex items-center gap-1 text-xs opacity-50">
         {formattedTime}
+        {fromMe && message.isRead && (
+          <span className="ml-1 text-blue-400">既読</span>
+        )}
       </div>
     </div>
   );

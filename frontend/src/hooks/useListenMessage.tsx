@@ -30,8 +30,30 @@ function useListenMessage() {
       }
     }
     socket?.on("newMessage", handleNewMessage);
+
     return () => {
       socket?.off("newMessage");
+    };
+  }, [socket, selectedConversation?._id, queryClient]);
+
+  useEffect(() => {
+    if (!socket) return;
+    function handleMessagesRead({
+      conversationId,
+    }: {
+      conversationId: string;
+    }) {
+      if (conversationId === selectedConversation?._id) {
+        queryClient.setQueryData<MessageType[]>(
+          ["messages", conversationId],
+          (oleMessage) =>
+            oleMessage?.map((message) => ({ ...message, isRead: true })),
+        );
+      }
+    }
+    socket.on("messagesRead", handleMessagesRead);
+    return () => {
+      socket?.off("messagesRead");
     };
   }, [socket, selectedConversation?._id, queryClient]);
 }
