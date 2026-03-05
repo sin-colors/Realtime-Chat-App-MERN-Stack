@@ -76,3 +76,46 @@ export async function getMessages(req: Request, res: Response) {
     });
   }
 }
+
+export async function markAsRead(req: Request, res: Response) {
+  try {
+    // チャット相手のID
+    const { conversationId } = req.params;
+    // 自分のID
+    const userId = req.user?._id;
+    // 相手から自分に送られた未読メッセージをすべて既読にする
+    const result = await Message.updateMany(
+      {
+        senderId: conversationId,
+        receiverId: userId,
+        isRead: false,
+      },
+      {
+        $set: { isRead: true },
+      },
+    );
+    // 相手がオンラインであれば、Socket.io で「既読になったよ」と通知する
+    if (typeof conversationId === "string") {
+      const receiverSocketId = getReceiverSocketId(conversationId);
+      if (receiverSocketId) {
+        // 相手側に対して「自分（userId）との会話が既読になった」ことを伝える
+        io.to(receiverSocketId).emit("messagesRead", {
+          conversationId: userId, // 相手から見た「既読にされた会話のID」は、自分のID
+        });
+      }
+    }
+    res
+      .status(200)
+      .json({
+        message: "既読に更新されました",
+        modifiedCount: result.modifiedCount,
+      });
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log("markAsRead controllerでエラーが発生しました", err.message);
+    } else {
+      console.log("markAsRead controllerでエラーが発生しました", err);
+    }
+    res.status(500).json({ error: "既読更新中にエラーが発生しました" });
+  }
+}

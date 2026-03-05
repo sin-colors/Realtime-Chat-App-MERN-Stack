@@ -8,5 +8,7 @@ const router = express.Router();
 router.get("/:id", protectRoute, getMessages);
 // :idは送信先のユーザーのid(_id)
 router.post("/send/:receiverId", protectRoute, sendMessage);
+//
+router.put("/read/:conversationId", protectRoute, markAsRead);
 
 export default router;
