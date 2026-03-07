@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { BsSend } from "react-icons/bs";
-import z from "zod";
 import {
   Form,
   FormControl,
@@ -18,19 +17,17 @@ import { BookImage, Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { MessageType } from "@/types";
 import { Textarea } from "../ui/textarea";
-
-const messageInputSchema = z.object({
-  message: z
-    .string()
-    .min(1, { message: "メッセージを入力してから送信してください" }),
-});
-type MessageInputType = z.infer<typeof messageInputSchema>;
+import {
+  messageInputSchema,
+  type MessageInputType,
+} from "@/lib/schema/messageSchema";
 
 function MessageInput() {
   const form = useForm<MessageInputType>({
     resolver: zodResolver(messageInputSchema),
     defaultValues: {
       message: "",
+      image: "",
     },
   });
   const { selectedConversation } = useConversation();
