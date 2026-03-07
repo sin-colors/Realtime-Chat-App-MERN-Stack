@@ -7,15 +7,17 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import useConversation from "@/zustand/useConversation";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { BookImage, Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { MessageType } from "@/types";
+import { Textarea } from "../ui/textarea";
 
 const messageInputSchema = z.object({
   message: z
@@ -69,6 +71,67 @@ function MessageInput() {
   }
   return (
     <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="bg-white px-4 py-3"
+      >
+        <div className="flex items-center gap-2">
+          <FormField
+            control={form.control}
+            name="image"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="inset-y-0 end-0 flex items-center rounded p-1.5">
+                  <BookImage className="cursor-pointer" />
+                </FormLabel>
+                <FormControl>
+                  <Input type={"file"} className="hidden" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="message"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <Textarea
+                    rows={1}
+                    placeholder="send a message"
+                    className="block h-auto max-h-20 min-h-0 w-full overflow-y-scroll rounded-lg border border-gray-600 bg-gray-700 text-sm text-white"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type="submit"
+            variant={"ghost"}
+            className="inset-y-0 end-0 flex cursor-pointer items-center px-3"
+          >
+            {isPending ? (
+              <Loader2 className="h-6 w-6 animate-spin text-white" />
+            ) : (
+              <BsSend />
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
+export default MessageInput;
+
+//---------------------------------画像機能追加前のUI----------------------------------------
+
+{
+  /* <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="my-3 px-4">
         <FormField
           control={form.control}
@@ -98,11 +161,8 @@ function MessageInput() {
         />
         <FormMessage />
       </form>
-    </Form>
-  );
+    </Form> */
 }
-
-export default MessageInput;
 
 //------------------------------React Query導入前のコード----------------------------------
 // function MessageInput() {
