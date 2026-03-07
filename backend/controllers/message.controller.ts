@@ -104,12 +104,10 @@ export async function markAsRead(req: Request, res: Response) {
         });
       }
     }
-    res
-      .status(200)
-      .json({
-        message: "既読に更新されました",
-        modifiedCount: result.modifiedCount,
-      });
+    res.status(200).json({
+      message: "既読に更新されました",
+      modifiedCount: result.modifiedCount,
+    });
   } catch (err) {
     if (err instanceof Error) {
       console.log("markAsRead controllerでエラーが発生しました", err.message);

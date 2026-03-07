@@ -14,7 +14,7 @@ function Message({ message }: { message: MessageType }) {
   const profilePic = fromMe
     ? authUser.profilePic
     : selectedConversation?.profilePic;
-  const bubbleBgColor = fromMe ? "bg-blue-500" : "";
+  const bubbleBgColor = fromMe ? "bg-lime-200" : "bg-rose-200";
   const formattedTime = extractTime(message.createdAt);
   return (
     <div className={`chat ${chatClassName}`}>
@@ -27,14 +27,17 @@ function Message({ message }: { message: MessageType }) {
           />
         </div>
       </div>
-      <div className={`chat-bubble text-white ${bubbleBgColor} pb-2`}>
+      <div className={`chat-bubble text-zinc-900 ${bubbleBgColor} pb-2`}>
         {message.message}
       </div>
       <div className="chat-footer flex items-center gap-1 text-xs opacity-50">
         {formattedTime}
-        {fromMe && message.isRead && (
-          <span className="ml-1 text-blue-400">既読</span>
-        )}
+        {fromMe &&
+          (message.isRead ? (
+            <span className="ml-1">既読</span>
+          ) : (
+            <span className="ml-1">未読</span>
+          ))}
       </div>
     </div>
   );

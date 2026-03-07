@@ -9,19 +9,22 @@ function MessageContainer() {
     return () => setSelectedConversation(null);
   }, [setSelectedConversation]);
   return (
-    <div className="flex flex-col md:min-w-[450px]">
+    <div className="flex w-full flex-col md:min-w-[450px]">
       {!selectedConversation ? (
         <NoChatSelected />
       ) : (
         <>
           {/* Header */}
-          <div className="mb-2 bg-slate-500 px-4 py-2">
+          <div className="mb-2 hidden bg-slate-500 px-4 py-2 sm:block">
             {/* <span className="label-text">To:</span> */}
             {/* <span className="text-sm font-medium text-slate-200">To:</span> */}
             <Label className="font-normal text-slate-200">To:</Label>
             <span className="font-bold text-gray-900">
               {selectedConversation.userName}
             </span>
+          </div>
+          <div className="block sm:hidden">
+            <MobileHeader />
           </div>
           <Messages />
           <MessageInput />
@@ -36,6 +39,7 @@ export default MessageContainer;
 import { TiMessages } from "react-icons/ti";
 import { useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
+import MobileHeader from "../sidebar/MobileHeader";
 function NoChatSelected() {
   const { authUser } = useAuthContext();
   return (

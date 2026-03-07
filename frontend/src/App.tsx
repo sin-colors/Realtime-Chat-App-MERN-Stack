@@ -14,7 +14,7 @@ function App() {
   const { authUser } = useAuthContext();
   return (
     <>
-      <div className="flex h-screen items-center justify-center p-4">
+      <div className="flex h-screen w-full items-center justify-center md:p-4">
         <Toaster position="top-center" richColors closeButton />
         <Routes>
           <Route

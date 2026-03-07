@@ -7,7 +7,7 @@ function useMarkAsRead() {
   return useMutation({
     mutationFn: async (conversationId: string) => {
       const response = await fetch(`/api/messages/read/${conversationId}`, {
-        method: "POST",
+        method: "PUT",
       });
       return response.json();
     },
