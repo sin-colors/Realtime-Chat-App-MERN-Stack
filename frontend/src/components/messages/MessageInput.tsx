@@ -23,6 +23,20 @@ import {
 } from "@/lib/schema/messageSchema";
 import { useEffect, useRef, useState } from "react";
 
+interface SendMessageProps {
+  message: string;
+  images: string[];
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
+
 function MessageInput() {
   const form = useForm<MessageInputType>({
     resolver: zodResolver(messageInputSchema),
@@ -37,7 +51,7 @@ function MessageInput() {
   const { selectedConversation } = useConversation();
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: async (value: MessageInputType) => {
+    mutationFn: async (value: SendMessageProps) => {
       const response = await fetch(
         `/api/messages/send/${selectedConversation?._id}`,
         {
@@ -71,15 +85,31 @@ function MessageInput() {
       }
     },
   });
+
   useEffect(() => {
     return () => {
       imageUrls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [imageUrls]);
+
   async function onSubmit(value: MessageInputType) {
     if (!value.message.trim() && !value.image) return;
-    mutate(value);
+    let base64Images: string[] = [];
+    // 画像がある場合、すべてBase64に変換
+    if (value.image && value.image.length > 0) {
+      base64Images = await Promise.all(
+        Array.from(value.image).map((file) => fileToBase64(file)),
+      );
+    }
+    // サーバーに送る形式に作り替える
+    const payload: SendMessageProps = {
+      message: value.message,
+      images: base64Images, // 文字列の配列として送る
+    };
+
+    mutate(payload); // mutateに渡す
   }
+
   return (
     <Form {...form}>
       <form
