@@ -29,7 +29,9 @@ export async function sendMessage(req: Request, res: Response) {
     let imageUrls: string[] = [];
     for (const image of images) {
       if (image) {
-        const uploadResponse = await cloudinary.uploader.upload(image);
+        const uploadResponse = await cloudinary.uploader.upload(image, {
+          folder: process.env.CLOUDINARY_FOLDER,
+        });
         imageUrls.push(uploadResponse.secure_url);
       }
     }

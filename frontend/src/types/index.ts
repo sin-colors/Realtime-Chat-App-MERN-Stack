@@ -13,6 +13,7 @@ export interface MessageType {
   senderId: string;
   receiverId: string;
   message: string;
+  images: string[];
   isRead: boolean;
   createdAt: string;
   updatedAt: string;
