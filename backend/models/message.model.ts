@@ -14,6 +14,11 @@ const messageSchema = new mongoose.Schema(
     },
     message: {
       type: String,
+      required: function () {
+        // images配列が[]である場合は、messageは必須とする
+        // (images配列が[]で、messageが""である場合はエラーとなるようにする)
+        return Array.isArray(this.images) && this.images.length === 0;
+      },
     },
     images: {
       type: [String],
