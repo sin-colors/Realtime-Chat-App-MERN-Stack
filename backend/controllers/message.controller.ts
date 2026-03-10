@@ -9,7 +9,8 @@ export async function sendMessage(req: Request, res: Response) {
   try {
     // console.log(req.body);
     const { message, images } = req.body;
-    // console.log("message: ", message);
+    console.log("message: ", message);
+    console.log("images: ", images);
     const { receiverId } = req.params;
     // console.log("receiverId: ", receiverId);
     if (!req.user) {

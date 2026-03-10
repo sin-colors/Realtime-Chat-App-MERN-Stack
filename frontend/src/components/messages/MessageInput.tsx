@@ -52,6 +52,7 @@ function MessageInput() {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: async (value: SendMessageProps) => {
+      console.log("value_in_mutate: ", value);
       const response = await fetch(
         `/api/messages/send/${selectedConversation?._id}`,
         {
@@ -94,6 +95,8 @@ function MessageInput() {
 
   async function onSubmit(value: MessageInputType) {
     if (!value.message.trim() && !value.image) return;
+    console.log("value: ", value);
+    console.log("value.image: ", value.image);
     let base64Images: string[] = [];
     // 画像がある場合、すべてBase64に変換
     if (value.image && value.image.length > 0) {
@@ -101,6 +104,7 @@ function MessageInput() {
         Array.from(value.image).map((file) => fileToBase64(file)),
       );
     }
+    console.log("base64Images: ", base64Images);
     // サーバーに送る形式に作り替える
     const payload: SendMessageProps = {
       message: value.message,
