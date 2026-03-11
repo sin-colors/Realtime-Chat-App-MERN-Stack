@@ -13,7 +13,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import useConversation from "@/zustand/useConversation";
 import { toast } from "sonner";
-import { BookImage, Loader2, Trash2 } from "lucide-react";
+import { BookImage, Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { MessageType } from "@/types";
 import { Textarea } from "../ui/textarea";
@@ -22,6 +22,7 @@ import {
   type MessageInputType,
 } from "@/lib/schema/messageSchema";
 import { useEffect, useRef, useState } from "react";
+import FilePreview from "../FilePreview";
 
 interface SendMessageProps {
   message: string;
@@ -119,58 +120,40 @@ function MessageInput() {
     mutate(payload); // mutateに渡す
   }
 
-  function FilePreview() {
-    function handleFileRemove(index: number) {
-      // 削除対象となるURLを先に取得しておく
-      const urlToRevoke = imageUrls[index];
-      // Stateの更新
-      setImageUrls((prevImageUrls) =>
-        prevImageUrls.filter((_, idx) => idx !== index),
-      );
-      // React Hook Formの値を更新
-      if (files) {
-        const updateImageUrls = files.filter((_, idx) => idx !== index);
-        // フォームのフィールドの更新
-        form.setValue("images", updateImageUrls);
-      }
-      // inputの値をリセット（同じファイルを再度選択できるようにするため）
-      if (fileInputRef.current) {
-        // <input />のvalueを空（空文字）にする
-        fileInputRef.current.value = "";
-      }
-      // メモリ解放（対象のURLだけを無効化する）
-      if (urlToRevoke) {
-        URL.revokeObjectURL(urlToRevoke);
-        urlsRef.current = urlsRef.current.filter((u) => u !== urlToRevoke);
-      }
-    }
-    return (
-      <div className="flex flex-wrap gap-2 px-4 pt-2">
-        {imageUrls.length > 0 &&
-          imageUrls.map((imageUrl, index) => (
-            <div key={index} className="group relative w-12">
-              <img
-                src={imageUrl}
-                alt="File Preview"
-                className="rounded object-cover"
-              />
-              {!isPending && (
-                <button
-                  onClick={() => handleFileRemove(index)}
-                  className="absolute -top-2 -right-2 cursor-pointer rounded-full bg-black/75 p-1 text-white transition-opacity md:opacity-0 md:group-hover:opacity-100"
-                >
-                  <Trash2 size={12} />
-                </button>
-              )}
-            </div>
-          ))}
-      </div>
+  function handleFilePreviewRemove(index: number) {
+    // 削除対象となるURLを先に取得しておく
+    const urlToRevoke = imageUrls[index];
+    // Stateの更新
+    setImageUrls((prevImageUrls) =>
+      prevImageUrls.filter((_, idx) => idx !== index),
     );
+    // React Hook Formの値を更新
+    if (files) {
+      const updateImageUrls = files.filter((_, idx) => idx !== index);
+      // フォームのフィールドの更新
+      form.setValue("images", updateImageUrls);
+    }
+    // inputの値をリセット（同じファイルを再度選択できるようにするため）
+    if (fileInputRef.current) {
+      // <input />のvalueを空（空文字）にする
+      fileInputRef.current.value = "";
+    }
+    // メモリ解放（対象のURLだけを無効化する）
+    if (urlToRevoke) {
+      URL.revokeObjectURL(urlToRevoke);
+      urlsRef.current = urlsRef.current.filter((u) => u !== urlToRevoke);
+    }
   }
 
   return (
     <div className="bg-white">
-      {imageUrls.length > 0 && <FilePreview />}
+      {imageUrls.length > 0 && (
+        <FilePreview
+          imageUrls={imageUrls}
+          onRemove={handleFilePreviewRemove}
+          disabled={isPending}
+        />
+      )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white p-2">
           <div className="flex items-center gap-1.5">
