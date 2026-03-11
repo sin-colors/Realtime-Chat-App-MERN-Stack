@@ -71,12 +71,6 @@ function MessageInput() {
         ["messages", selectedConversation?._id],
         (oldMessages) => [...(oldMessages || []), newMessage],
       );
-      form.reset();
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-      imageUrls.forEach((url) => URL.revokeObjectURL(url));
-      setImageUrls([]);
     },
     onError: (err) => {
       if (err instanceof Error) {
@@ -84,6 +78,14 @@ function MessageInput() {
       } else {
         toast.error("メッセージの送信に失敗しました！");
       }
+    },
+    onSettled: () => {
+      form.reset();
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      imageUrls.forEach((url) => URL.revokeObjectURL(url));
+      setImageUrls([]);
     },
   });
 
