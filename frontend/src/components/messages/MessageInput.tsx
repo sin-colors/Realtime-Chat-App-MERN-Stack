@@ -23,19 +23,11 @@ import {
 } from "@/lib/schema/messageSchema";
 import { useEffect, useRef, useState } from "react";
 import FilePreview from "../FilePreview";
+import fileToBase64 from "@/utils/fileToBase64";
 
 interface SendMessageProps {
   message: string;
   images: string[];
-}
-
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (err) => reject(err);
-    reader.readAsDataURL(file);
-  });
 }
 
 function MessageInput() {
@@ -101,8 +93,6 @@ function MessageInput() {
   // フォームを送信する際にFileオブジェクトの配列をBase64文字列の配列に変換してから送信する
   async function onSubmit(value: MessageInputType) {
     if (!value.message.trim() && !value.images) return;
-    // console.log("value: ", value);
-    // console.log("value.images: ", value.images);
     let base64Images: string[] = [];
     // 画像がある場合、すべてBase64に変換
     if (value.images && value.images.length > 0) {
@@ -110,13 +100,11 @@ function MessageInput() {
         Array.from(value.images).map((file) => fileToBase64(file)),
       );
     }
-    // console.log("base64Images: ", base64Images);
     // サーバーに送る形式に作り替える
     const payload: SendMessageProps = {
       message: value.message,
       images: base64Images, // 文字列の配列として送る
     };
-
     mutate(payload); // mutateに渡す
   }
 
