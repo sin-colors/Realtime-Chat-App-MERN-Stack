@@ -6,7 +6,7 @@ const MAX_IMAGE_FILE_SIZE = 1024 * 1024 * 15; //15MB
 export const messageInputSchema = z
   .object({
     message: z.string(),
-    image: z
+    images: z
       .array(
         z.instanceof(File).refine(
           (file) => {
@@ -35,7 +35,7 @@ export const messageInputSchema = z
         },
       ),
   })
-  .refine((data) => data.message.trim() !== null || data.image !== null, {
+  .refine((data) => data.message.trim() !== null || data.images !== null, {
     message: "テキストか画像のどちらかは必須です",
     path: ["message"],
   });

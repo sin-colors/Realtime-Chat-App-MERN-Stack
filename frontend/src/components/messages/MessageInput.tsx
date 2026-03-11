@@ -13,7 +13,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import useConversation from "@/zustand/useConversation";
 import { toast } from "sonner";
-import { BookImage, Loader2 } from "lucide-react";
+import { BookImage, Loader2, Trash2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { MessageType } from "@/types";
 import { Textarea } from "../ui/textarea";
@@ -42,12 +42,13 @@ function MessageInput() {
     resolver: zodResolver(messageInputSchema),
     defaultValues: {
       message: "",
-      image: null,
+      images: null,
     },
   });
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const files = form.watch("image");
+  const files = form.watch("images");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const urlsRef = useRef<string[]>([]);
   const { selectedConversation } = useConversation();
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
@@ -91,22 +92,24 @@ function MessageInput() {
 
   useEffect(() => {
     return () => {
-      imageUrls.forEach((url) => URL.revokeObjectURL(url));
+      urlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+      // imageUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [imageUrls]);
+  }, []);
 
+  // フォームを送信する際にFileオブジェクトの配列をBase64文字列の配列に変換してから送信する
   async function onSubmit(value: MessageInputType) {
-    if (!value.message.trim() && !value.image) return;
-    console.log("value: ", value);
-    console.log("value.image: ", value.image);
+    if (!value.message.trim() && !value.images) return;
+    // console.log("value: ", value);
+    // console.log("value.images: ", value.images);
     let base64Images: string[] = [];
     // 画像がある場合、すべてBase64に変換
-    if (value.image && value.image.length > 0) {
+    if (value.images && value.images.length > 0) {
       base64Images = await Promise.all(
-        Array.from(value.image).map((file) => fileToBase64(file)),
+        Array.from(value.images).map((file) => fileToBase64(file)),
       );
     }
-    console.log("base64Images: ", base64Images);
+    // console.log("base64Images: ", base64Images);
     // サーバーに送る形式に作り替える
     const payload: SendMessageProps = {
       message: value.message,
@@ -116,89 +119,144 @@ function MessageInput() {
     mutate(payload); // mutateに渡す
   }
 
-  return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="bg-white px-4 py-3"
-      >
-        <div className="flex items-center gap-2">
-          <FormField
-            control={form.control}
-            name="image"
-            render={({ field: { onChange, onBlur, name, ref, disabled } }) => (
-              <FormItem>
-                <FormLabel className="inset-y-0 end-0 flex items-center rounded p-1.5">
-                  <BookImage className="cursor-pointer" />
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type={"file"}
-                    multiple
-                    className="hidden"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files.length > 0) {
-                        const newFiles = Array.from(e.target.files); // FileList → [File, File, ...]
-                        const newImageUrls = newFiles.map((file) =>
-                          URL.createObjectURL(file),
-                        );
-                        setImageUrls((prevImageUrls) => [
-                          ...prevImageUrls,
-                          ...newImageUrls,
-                        ]);
-                        const currentFiles = form.getValues("image") || [];
-                        onChange([...currentFiles, ...newFiles]);
-                      } else {
-                        setImageUrls([]);
-                        onChange(null);
-                      }
-                    }}
-                    ref={(instance) => {
-                      // instanceには<input>要素のDOMインスタンスが入る
-                      ref(instance); // React Hook Formがフォーム要素を管理するための指定
-                      fileInputRef.current = instance; // useRefを用いて作成した参照にDOM要素(<input />)をセット→DOM要素を直接操作するための指定
-                    }}
-                    name={name}
-                    onBlur={onBlur}
-                    disabled={isPending || disabled}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="message"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl>
-                  <Textarea
-                    rows={1}
-                    placeholder="send a message"
-                    className="block h-auto max-h-20 min-h-0 w-full overflow-y-scroll rounded-lg border border-gray-600 bg-gray-700 text-sm text-white"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+  function FilePreview() {
+    function handleFileRemove(index: number) {
+      // 削除対象となるURLを先に取得しておく
+      const urlToRevoke = imageUrls[index];
+      // Stateの更新
+      setImageUrls((prevImageUrls) =>
+        prevImageUrls.filter((_, idx) => idx !== index),
+      );
+      // React Hook Formの値を更新
+      if (files) {
+        const updateImageUrls = files.filter((_, idx) => idx !== index);
+        // フォームのフィールドの更新
+        form.setValue("images", updateImageUrls);
+      }
+      // inputの値をリセット（同じファイルを再度選択できるようにするため）
+      if (fileInputRef.current) {
+        // <input />のvalueを空（空文字）にする
+        fileInputRef.current.value = "";
+      }
+      // メモリ解放（対象のURLだけを無効化する）
+      if (urlToRevoke) {
+        URL.revokeObjectURL(urlToRevoke);
+        urlsRef.current = urlsRef.current.filter((u) => u !== urlToRevoke);
+      }
+    }
+    return (
+      <div className="flex flex-wrap gap-2 px-4 pt-2">
+        {imageUrls.length > 0 &&
+          imageUrls.map((imageUrl, index) => (
+            <div key={index} className="group relative w-12">
+              <img
+                src={imageUrl}
+                alt="File Preview"
+                className="rounded object-cover"
+              />
+              {!isPending && (
+                <button
+                  onClick={() => handleFileRemove(index)}
+                  className="absolute -top-2 -right-2 cursor-pointer rounded-full bg-black/75 p-1 text-white transition-opacity md:opacity-0 md:group-hover:opacity-100"
+                >
+                  <Trash2 size={12} />
+                </button>
+              )}
+            </div>
+          ))}
+      </div>
+    );
+  }
 
-          <Button
-            type="submit"
-            variant={"ghost"}
-            className="inset-y-0 end-0 flex cursor-pointer items-center px-3"
-          >
-            {isPending ? (
-              <Loader2 className="h-6 w-6 animate-spin text-white" />
-            ) : (
-              <BsSend />
-            )}
-          </Button>
-        </div>
-      </form>
-    </Form>
+  return (
+    <div className="bg-white">
+      {imageUrls.length > 0 && <FilePreview />}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white p-2">
+          <div className="flex items-center gap-1.5">
+            <FormField
+              control={form.control}
+              name="images"
+              render={({
+                field: { onChange, onBlur, name, ref, disabled },
+              }) => (
+                <FormItem>
+                  <FormLabel className="inset-y-0 end-0 flex items-center rounded p-1.5">
+                    <BookImage className="cursor-pointer" />
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type={"file"}
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          const newFiles = Array.from(e.target.files); // FileList → [File, File, ...]
+                          const newImageUrls = newFiles.map((file) =>
+                            URL.createObjectURL(file),
+                          );
+                          setImageUrls((prevImageUrls) => [
+                            ...prevImageUrls,
+                            ...newImageUrls,
+                          ]);
+                          urlsRef.current = [
+                            ...urlsRef.current,
+                            ...newImageUrls,
+                          ];
+                          const currentFiles = form.getValues("images") || [];
+                          onChange([...currentFiles, ...newFiles]);
+                        } else {
+                          setImageUrls([]);
+                          onChange(null);
+                        }
+                      }}
+                      ref={(instance) => {
+                        // instanceには<input>要素のDOMインスタンスが入る
+                        ref(instance); // React Hook Formがフォーム要素を管理するための指定
+                        fileInputRef.current = instance; // useRefを用いて作成した参照にDOM要素(<input />)をセット→DOM要素を直接操作するための指定
+                      }}
+                      name={name}
+                      onBlur={onBlur}
+                      disabled={isPending || disabled}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormControl>
+                    <Textarea
+                      rows={1}
+                      placeholder="send a message"
+                      className="block h-auto max-h-20 min-h-0 w-full overflow-y-scroll rounded-lg border border-gray-600 bg-gray-700 text-sm text-white"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              variant={"ghost"}
+              className="inset-y-0 end-0 flex cursor-pointer items-center px-3"
+            >
+              {isPending ? (
+                <Loader2 className="h-6 w-6 animate-spin text-white" />
+              ) : (
+                <BsSend />
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 }
 
