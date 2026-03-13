@@ -46,7 +46,7 @@ function MessageInput() {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: async (value: SendMessageProps) => {
-      console.log("value_in_mutate: ", value);
+      // console.log("value_in_mutate: ", value);
       const response = await fetch(
         `/api/messages/send/${selectedConversation?._id}`,
         {

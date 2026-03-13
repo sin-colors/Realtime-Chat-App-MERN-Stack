@@ -3,14 +3,33 @@ import Conversation from "../models/conversation.model";
 import Message from "../models/message.model";
 import { getReceiverSocketId, io } from "../socket/socket";
 import cloudinary from "../config/cloudinary";
+import z from "zod";
+
+const sendMessageSchema = z
+  .object({
+    message: z.string(),
+    images: z.array(z.string()).nullable(),
+  })
+  .refine(
+    (data) => {
+      const hasMessage = data.message.trim().length > 0;
+      const hasImages = data.images !== null && data.images.length > 0;
+      return hasMessage || hasImages;
+    },
+    {
+      message: "テキストか画像のどちらかは必須です",
+      path: ["message"],
+    },
+  );
 
 export async function sendMessage(req: Request, res: Response) {
   // console.log("message sent!");
   try {
     // console.log(req.body);
-    const { message, images } = req.body;
-    console.log("message: ", message);
-    console.log("images: ", images);
+    const validateBody = sendMessageSchema.parse(req.body);
+    const { message, images } = validateBody;
+    // console.log("message: ", message);
+    // console.log("images: ", images);
     const { receiverId } = req.params;
     // console.log("receiverId: ", receiverId);
     if (!req.user) {
@@ -27,15 +46,31 @@ export async function sendMessage(req: Request, res: Response) {
         participants: [senderId, receiverId],
       });
     }
+
     let imageUrls: string[] = [];
-    for (const image of images) {
-      if (image) {
-        const uploadResponse = await cloudinary.uploader.upload(image, {
+
+    //-------Promise.allを使ったコードに変更-----------
+    // for (const image of images) {
+    //   if (image) {
+    //     const uploadResponse = await cloudinary.uploader.upload(image, {
+    //       folder: process.env.CLOUDINARY_FOLDER,
+    //     });
+    //     imageUrls.push(uploadResponse.secure_url);
+    //   }
+    // }
+    //------------------------------------------------
+
+    if (images !== null) {
+      const uploadPromises = images.map((image) =>
+        cloudinary.uploader.upload(image, {
           folder: process.env.CLOUDINARY_FOLDER,
-        });
-        imageUrls.push(uploadResponse.secure_url);
-      }
+        }),
+      );
+      const uploadResults = await Promise.all(uploadPromises);
+      // 2. アップロード後のURLを取得
+      imageUrls = uploadResults.map((result) => result.secure_url);
     }
+
     const newMessage = new Message({
       senderId,
       receiverId,

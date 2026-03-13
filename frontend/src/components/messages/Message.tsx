@@ -28,7 +28,7 @@ function Message({ message }: { message: MessageType }) {
         </div>
       </div>
       <div
-        className={`chat-bubble text-zinc-900 ${bubbleBgColor} fles flex-col pb-2`}
+        className={`chat-bubble text-zinc-900 ${bubbleBgColor} fles flex-col gap-2 pb-2`}
       >
         {message.images &&
           message.images.length > 0 &&
@@ -37,7 +37,7 @@ function Message({ message }: { message: MessageType }) {
               key={image}
               src={image}
               alt="送信した画像"
-              className="max-w-[250px] cursor-pointer rounded-lg hover:opacity-90"
+              className="max-w-62.5 cursor-pointer rounded-lg hover:opacity-90"
               onClick={() => window.open(image, "_blank")}
             />
           ))}
