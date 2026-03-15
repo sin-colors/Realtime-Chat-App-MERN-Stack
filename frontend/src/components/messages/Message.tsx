@@ -28,7 +28,7 @@ function Message({ message }: { message: MessageType }) {
         </div>
       </div>
       <div
-        className={`chat-bubble text-zinc-900 ${bubbleBgColor} fles flex-col gap-2 pb-2`}
+        className={`chat-bubble text-zinc-900 ${bubbleBgColor} flex flex-col gap-2 pb-2`}
       >
         {message.images &&
           message.images.length > 0 &&

@@ -6,7 +6,7 @@ function Home() {
   return (
     <div className="flex h-screen w-full max-w-4xl overflow-hidden rounded-lg bg-gray-400/0 bg-clip-padding backdrop-blur-lg backdrop-filter sm:h-[450px] md:h-[550px]">
       <div className="hidden sm:block">
-        <Sidebar />
+        <Sidebar showMessageMenu={true} />
       </div>
       <MessageContainer />
     </div>

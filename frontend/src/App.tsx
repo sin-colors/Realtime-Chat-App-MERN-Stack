@@ -1,14 +1,10 @@
-// import { useState } from "react";
-// import reactLogo from "./assets/react.svg";
-// import viteLogo from "/vite.svg";
-// import "./App.css";
-
 import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/login/Login";
 import Home from "./pages/home/Home";
 import Signup from "./pages/signup/Signup";
 import { Toaster } from "sonner";
 import { useAuthContext } from "./context/AuthContext";
+import Settings from "./pages/settings/Settings";
 
 function App() {
   const { authUser } = useAuthContext();
@@ -28,6 +24,10 @@ function App() {
           <Route
             path="/signup"
             element={authUser ? <Navigate to="/" /> : <Signup />}
+          />
+          <Route
+            path="/settings"
+            element={authUser ? <Settings /> : <Navigate to="/login" />}
           />
         </Routes>
       </div>
