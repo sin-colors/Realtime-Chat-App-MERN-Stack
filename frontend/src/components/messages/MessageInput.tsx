@@ -55,8 +55,13 @@ function MessageInput() {
           body: JSON.stringify(value),
         },
       );
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || `通信エラーが発生しました${response.status}`,
+        );
+      }
       const data = await response.json();
-      if (data.error) throw new Error(data.error);
       return data as MessageType;
     },
     onSuccess: (newMessage) => {

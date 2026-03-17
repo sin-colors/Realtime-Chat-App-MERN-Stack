@@ -5,6 +5,7 @@ import Signup from "./pages/signup/Signup";
 import { Toaster } from "sonner";
 import { useAuthContext } from "./context/AuthContext";
 import Settings from "./pages/settings/Settings";
+import ChangeUserNameForm from "./pages/settings/ChangeUserNameForm";
 
 function App() {
   const { authUser } = useAuthContext();
@@ -28,7 +29,9 @@ function App() {
           <Route
             path="/settings"
             element={authUser ? <Settings /> : <Navigate to="/login" />}
-          />
+          >
+            <Route path="username" element={<ChangeUserNameForm />} />
+          </Route>
         </Routes>
       </div>
     </>
@@ -36,3 +39,8 @@ function App() {
 }
 
 export default App;
+
+// パス(Routeコンポーネント)をネストする場合、子のパスは相対パスを指定する。(先頭に/を付けない！先頭の/はルートを表現している)
+// path="/username"とすると、ルート(ホスト名) ＋ /username と解釈される
+// ↑ Routeコンポーネントのネストとパス名がかみ合わないので、エラーが出る可能性がある
+// path="username"とすると、ルート(ホスト名) ＋ /settings(親のパス)＋ / ＋username(子のパス) と解釈される
