@@ -42,8 +42,12 @@ export async function changeUserName(req: Request, res: Response) {
     return res
       .status(400)
       .json({ error: "このユーザー名はすでに使われています" });
+  const boyProfilePic = `https://api.dicebear.com/9.x/avataaars/svg?seed=${newUserName}&top=shortFlat,shortRound,theCaesar,shaggy,shortWaved,shortCurly`;
+  const girlProfilePic = `https://api.dicebear.com/9.x/avataaars/svg?seed=${newUserName}&top=bigHair,bob,curvy,straight01,straightAndStrand`;
   // データベースの更新
+
   user.userName = newUserName;
+  user.profilePic = user.gender === "male" ? boyProfilePic : girlProfilePic;
   await user.save();
 
   return res.status(201).json({ message: "ユーザー名を更新しました" });

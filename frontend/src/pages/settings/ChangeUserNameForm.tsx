@@ -20,8 +20,10 @@ import z from "zod";
 
 const schema = z.object({
   currentUserName: z.string(),
-  newUserName: z.string(),
-  password: z.string(),
+  newUserName: z
+    .string()
+    .min(2, { message: "ユーザー名は２文字以上で入力してください" }),
+  password: z.string().min(1, { message: "パスワードは必須です" }),
 });
 type Schema = z.infer<typeof schema>;
 
@@ -38,7 +40,7 @@ async function changeUserName(data: Schema) {
       errorData.error || `通信エラーが発生しました(Status: ${response.status})`,
     );
   }
-  return response.json();
+  return await response.json();
 }
 
 function ChangeUserNameForm() {
