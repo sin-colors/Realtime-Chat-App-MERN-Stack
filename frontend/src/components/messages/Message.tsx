@@ -34,11 +34,11 @@ function Message({ message }: { message: MessageType }) {
           message.images.length > 0 &&
           message.images.map((image) => (
             <img
-              key={image}
-              src={image}
+              key={image.publicId}
+              src={image.url}
               alt="送信した画像"
               className="max-w-62.5 cursor-pointer rounded-lg hover:opacity-90"
-              onClick={() => window.open(image, "_blank")}
+              onClick={() => window.open(image.url, "_blank")}
             />
           ))}
         {message.message && <p>{message.message}</p>}

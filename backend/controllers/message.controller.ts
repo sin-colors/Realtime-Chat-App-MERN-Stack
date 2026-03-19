@@ -5,15 +5,27 @@ import { getReceiverSocketId, io } from "../socket/socket";
 import cloudinary from "../config/cloudinary";
 import z from "zod";
 
+interface ImagesType {
+  url: string;
+  publicId: string;
+}
+
 const sendMessageSchema = z
   .object({
     message: z.string(),
-    images: z.array(z.string()).nullable(),
+    images: z
+      .array(
+        z.object({
+          base64String: z.string(),
+          publicId: z.string(),
+        }),
+      )
+      .default([]),
   })
   .refine(
     (data) => {
       const hasMessage = data.message.trim().length > 0;
-      const hasImages = data.images !== null && data.images.length > 0;
+      const hasImages = Array.isArray(data.images) && data.images.length > 0;
       return hasMessage || hasImages;
     },
     {
@@ -21,6 +33,25 @@ const sendMessageSchema = z
       path: ["message"],
     },
   );
+
+//---------------------自動削除機能追加前のコード---------------------------------
+// const sendMessageSchema = z
+//   .object({
+//     message: z.string(),
+//     images: z.array(z.string()).nullable(),
+//   })
+//   .refine(
+//     (data) => {
+//       const hasMessage = data.message.trim().length > 0;
+//       const hasImages = data.images !== null && data.images.length > 0;
+//       return hasMessage || hasImages;
+//     },
+//     {
+//       message: "テキストか画像のどちらかは必須です",
+//       path: ["message"],
+//     },
+//   );
+//-------------------------------------------------------------------
 
 export async function sendMessage(req: Request, res: Response) {
   // console.log("message sent!");
@@ -47,7 +78,7 @@ export async function sendMessage(req: Request, res: Response) {
       });
     }
 
-    let imageUrls: string[] = [];
+    let imageUrls: ImagesType[] = [];
 
     //-------Promise.allを使ったコードに変更-----------
     // for (const image of images) {
@@ -62,13 +93,19 @@ export async function sendMessage(req: Request, res: Response) {
 
     if (images !== null) {
       const uploadPromises = images.map((image) =>
-        cloudinary.uploader.upload(image, {
+        cloudinary.uploader.upload(image.base64String, {
           folder: process.env.CLOUDINARY_FOLDER,
         }),
       );
       const uploadResults = await Promise.all(uploadPromises);
       // 2. アップロード後のURLを取得
-      imageUrls = uploadResults.map((result) => result.secure_url);
+      imageUrls = uploadResults.map((result) => ({
+        url: result.secure_url,
+        publicId: result.public_id,
+      }));
+      //---------------imagesフィールド変更前のコード----------------------
+      // imageUrls = uploadResults.map((result) => result.secure_url);
+      //----------------------------------------------------------------
     }
 
     const newMessage = new Message({

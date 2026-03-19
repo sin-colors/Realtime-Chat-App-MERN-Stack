@@ -6,6 +6,7 @@ import userRoutes from "./routes/user.routes";
 import connectToMongoDB from "./db/connectToMongoDB";
 import cookieParser from "cookie-parser";
 import { app, server } from "./socket/socket";
+import setupCron from "./jobs/cron";
 
 // const app = express();
 dotenv.config();
@@ -20,6 +21,8 @@ app.use("/api/users", userRoutes);
 // app.get("/", (req, res) => {
 //   res.send("Hello World!");
 // });
+
+setupCron();
 
 server.listen(PORT, () => {
   connectToMongoDB();
