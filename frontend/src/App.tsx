@@ -6,9 +6,20 @@ import { Toaster } from "sonner";
 import { useAuthContext } from "./context/AuthContext";
 import Settings from "./pages/settings/Settings";
 import ChangeUserNameForm from "./pages/settings/ChangeUserNameForm";
+import { Loader2 } from "lucide-react";
 
 function App() {
-  const { authUser } = useAuthContext();
+  const { authUser, isPending } = useAuthContext();
+
+  if (isPending) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        {/* Lucide-reactのアイコンを回す例 */}
+        <Loader2 className="text-primary h-10 w-10 animate-spin" />
+        <span className="ml-2 text-lg font-medium">読み込み中...</span>
+      </div>
+    );
+  }
   return (
     <>
       <div className="flex h-screen w-full items-center justify-center md:p-4">

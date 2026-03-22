@@ -51,6 +51,7 @@ export async function signup(req: Request, res: Response) {
       res.status(201).json({
         _id: newUser._id,
         userName: newUser.userName,
+        gender: newUser.gender,
         profilePic: newUser.profilePic,
       });
     } else {
@@ -92,6 +93,7 @@ export async function login(req: Request, res: Response) {
     res.status(200).json({
       _id: user._id,
       userName: user.userName,
+      gender: user.gender,
       profilePic: user.profilePic,
     });
   } catch (err) {

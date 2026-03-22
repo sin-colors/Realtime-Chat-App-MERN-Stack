@@ -1,5 +1,6 @@
-import { useAuthContext } from "@/context/AuthContext";
+// import { useAuthContext } from "@/context/AuthContext";
 import type { LoginType } from "@/lib/schema/authSchema";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 // function useLogin() {
@@ -24,8 +25,10 @@ import { toast } from "sonner";
 //   }
 //   return { login };
 // }
+
 function useLogin() {
-  const { setAuthUser } = useAuthContext();
+  // const { setAuthUser } = useAuthContext();
+  const queryClient = useQueryClient();
   async function login(values: LoginType) {
     const loginPromise = (async () => {
       const response = await fetch("/api/auth/login", {
@@ -33,10 +36,15 @@ function useLogin() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
       const loginData = await response.json();
-      if (loginData.error) throw new Error(loginData.error);
-      localStorage.setItem("chat-user", JSON.stringify(loginData));
-      setAuthUser(loginData);
+      // if (loginData.error) throw new Error(loginData.error);
+      // localStorage.setItem("chat-user", JSON.stringify(loginData));
+      // setAuthUser(loginData);
+      queryClient.setQueryData(["authUser"], loginData);
     })();
     toast.promise(loginPromise, {
       loading: "ログインしています。。。",
