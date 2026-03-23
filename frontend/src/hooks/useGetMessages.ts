@@ -26,7 +26,14 @@ function useGetMessages() {
     // selectedConversation._id がある時だけ実行する（重要！）
     enabled: !!selectedConversation?._id,
     // 常に最新を保つための設定（お好みで）
-    refetchOnWindowFocus: false,
+    // refetchOnWindowFocus: false,
+    select: (messages) => {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      return messages.filter(
+        (message) => new Date(message.createdAt) > sixMonthsAgo,
+      );
+    },
   });
 }
 export default useGetMessages;
